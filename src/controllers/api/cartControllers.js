@@ -51,32 +51,34 @@ exports.addProductToCart = async (req, res) => {
   if (!cartToUse) throw new NotFoundError("This cart does not exist");
   if (!productToAdd) throw new NotFoundError("This product does not exist");
 
-  cartToUse.totalPrice = 0;
+  //funkade inte
+  // let cartProductList = cartToUse.cartProducts;
+  // let productInCart = cartProductList.includes(productToAdd);
+  // console.log("produkten: ", productInCart);
+
   if (cartToUse.cartProducts.length < 1) {
     cartToUse.cartProducts.push(productToAdd);
+    // cartToUse.totalPrice += cartToUse.cartProducts.price;
     await cartToUse.save();
   } else {
     for (let i = 0; i < cartToUse.cartProducts.length; i++) {
-      if (cartToUse.cartProducts[i]._id != productId) {
-        cartToUse.cartProducts.push(productToAdd);
-        await cartToUse.save();
-      }
       if (cartToUse.cartProducts[i]._id == productId) {
         cartToUse.cartProducts[i].numberOfProduct++;
-        console.log(cartToUse.cartProducts[i].numberOfProduct);
         await cartToUse.save();
-
-        for (
-          let i = 0;
-          i < cartToUse.cartProducts[i].numberOfProduct.length;
-          i++
-        ) {
-          let priceOfProducts =
-            cartToUse.cartProducts[i].price *
-            cartToUse.cartProducts[i].numberOfProduct;
-        }
       }
+      cartToUse.totalPrice =
+        cartToUse.cartProducts[i].price *
+        cartToUse.cartProducts[i].numberOfProduct;
+      console.log("totalPris : ", cartToUse.totalPrice);
+      await cartToUse.save();
     }
+    // for (let i = 0; i < cartToUse.cartProducts.length; i++) {
+    //   cartToUse.totalPrice =
+    //     cartToUse.cartProducts[i].price *
+    //     cartToUse.cartProducts[i].numberOfProduct;
+    //   console.log("totalPris : ", cartToUse.totalPrice);
+    //   await cartToUse.save();
+    // }
   }
 
   // for (let i = 0; i < cartToUse.cartProducts.length; i++) {
@@ -85,12 +87,12 @@ exports.addProductToCart = async (req, res) => {
 
   // cartToUse.totalPrice = priceOfProducts + totalPrice;
 
-  for (let i = 0; i < cartToUse.cartProducts.length; i++) {
-    cartToUse.totalPrice += cartToUse.cartProducts[i].price;
-  }
+  // for (let i = 0; i < cartToUse.cartProducts.length; i++) {
+  //   cartToUse.totalPrice += cartToUse.cartProducts[i].price;
+  // }
 
   const updatedCart = await cartToUse.save();
-  console.log(updatedCart);
-  console.log("totalPris: ", cartToUse.totalPrice);
+  // console.log(updatedCart);
+  // console.log("totalPris: ", cartToUse.totalPrice);
   return res.json(updatedCart);
 };

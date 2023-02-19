@@ -22,7 +22,7 @@ const CartSchema = new mongoose.Schema({
       },
       numberOfProduct: {
         type: Number,
-        default: 0,
+        default: 1,
       },
     },
   ],
