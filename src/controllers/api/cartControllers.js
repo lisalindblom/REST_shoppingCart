@@ -55,44 +55,37 @@ exports.addProductToCart = async (req, res) => {
   // let cartProductList = cartToUse.cartProducts;
   // let productInCart = cartProductList.includes(productToAdd);
   // console.log("produkten: ", productInCart);
+  let productIsNew = true;
 
-  if (cartToUse.cartProducts.length < 1) {
-    cartToUse.cartProducts.push(productToAdd);
-    // cartToUse.totalPrice += cartToUse.cartProducts.price;
-    await cartToUse.save();
-  } else {
-    for (let i = 0; i < cartToUse.cartProducts.length; i++) {
-      if (cartToUse.cartProducts[i]._id == productId) {
-        cartToUse.cartProducts[i].numberOfProduct++;
-        await cartToUse.save();
-      }
-      cartToUse.totalPrice =
-        cartToUse.cartProducts[i].price *
-        cartToUse.cartProducts[i].numberOfProduct;
-      console.log("totalPris : ", cartToUse.totalPrice);
+  for (let i = 0; i < cartToUse.cartProducts.length; i++) {
+    if (cartToUse.cartProducts[i]._id == productId) {
+      cartToUse.cartProducts[i].numberOfProduct++;
       await cartToUse.save();
+      productIsNew = false;
     }
-    // for (let i = 0; i < cartToUse.cartProducts.length; i++) {
-    //   cartToUse.totalPrice =
-    //     cartToUse.cartProducts[i].price *
-    //     cartToUse.cartProducts[i].numberOfProduct;
-    //   console.log("totalPris : ", cartToUse.totalPrice);
-    //   await cartToUse.save();
-    // }
+  }
+  if (productIsNew) {
+    cartToUse.cartProducts.push(productToAdd);
+    cartToUse.totalPrice = productToAdd.price;
+    await cartToUse.save();
   }
 
-  // for (let i = 0; i < cartToUse.cartProducts.length; i++) {
-  //   let totalPrice = +cartToUse.cartProducts[i].price;
-  // }
+  cartToUse.totalPrice = 0;
+  for (let i = 0; i < cartToUse.cartProducts.length; i++) {
+    cartToUse.totalPrice +=
+      cartToUse.cartProducts[i].price *
+      cartToUse.cartProducts[i].numberOfProduct;
+  }
+  await cartToUse.save();
 
-  // cartToUse.totalPrice = priceOfProducts + totalPrice;
-
-  // for (let i = 0; i < cartToUse.cartProducts.length; i++) {
-  //   cartToUse.totalPrice += cartToUse.cartProducts[i].price;
-  // }
+  /********************** Måste stå sist *****************************/
+  if (cartToUse.cartProducts.length < 1) {
+    cartToUse.cartProducts.push(productToAdd);
+    cartToUse.totalPrice = productToAdd.price;
+    await cartToUse.save();
+  }
 
   const updatedCart = await cartToUse.save();
-  // console.log(updatedCart);
-  // console.log("totalPris: ", cartToUse.totalPrice);
+
   return res.json(updatedCart);
 };
