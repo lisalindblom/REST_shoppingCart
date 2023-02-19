@@ -8,6 +8,5 @@ const {
 
 router.get("/:productId", getProductById);
 router.get("/", getAllProducts);
-// router.post("/:productId", addProductToCart);
 
 module.exports = router;

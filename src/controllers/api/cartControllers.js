@@ -51,10 +51,6 @@ exports.addProductToCart = async (req, res) => {
   if (!cartToUse) throw new NotFoundError("This cart does not exist");
   if (!productToAdd) throw new NotFoundError("This product does not exist");
 
-  //funkade inte
-  // let cartProductList = cartToUse.cartProducts;
-  // let productInCart = cartProductList.includes(productToAdd);
-  // console.log("produkten: ", productInCart);
   let productIsNew = true;
 
   for (let i = 0; i < cartToUse.cartProducts.length; i++) {
@@ -84,6 +80,43 @@ exports.addProductToCart = async (req, res) => {
     cartToUse.totalPrice = productToAdd.price;
     await cartToUse.save();
   }
+
+  const updatedCart = await cartToUse.save();
+
+  return res.json(updatedCart);
+};
+
+exports.removeProductFromCart = async (req, res) => {
+  const cartId = req.params.cartId;
+  const productId = req.body.id;
+
+  const cartToUse = await Cart.findById(cartId);
+  if (!cartToUse) throw new NotFoundError("This cart does not exist");
+
+  //måste kontrollera om den finns i listan...
+  const productToRemove = await Product.findById(productId);
+  if (!productToRemove) throw new NotFoundError("This product does not exist");
+
+  for (let i = 0; i < cartToUse.cartProducts.length; i++) {
+    if (cartToUse.cartProducts[i]._id == productId) {
+      cartToUse.cartProducts[i].numberOfProduct -= 1;
+      await cartToUse.save();
+
+      if (cartToUse.cartProducts[i].numberOfProduct < 1) {
+        cartToUse.cartProducts.splice([i], 1);
+        console.log("ta bort helt");
+
+        await cartToUse.save();
+      }
+    }
+  }
+  cartToUse.totalPrice = 0;
+  for (let i = 0; i < cartToUse.cartProducts.length; i++) {
+    cartToUse.totalPrice +=
+      cartToUse.cartProducts[i].price *
+      cartToUse.cartProducts[i].numberOfProduct;
+  }
+  await cartToUse.save();
 
   const updatedCart = await cartToUse.save();
 
