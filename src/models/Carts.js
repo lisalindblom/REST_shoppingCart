@@ -26,11 +26,5 @@ const CartSchema = new mongoose.Schema({
       },
     },
   ],
-  // cartProducts: {
-  //   type: [mongoose.Schema.Types.ObjectId],
-  //   ref: "Products",
-  //   default: [{}],
-  // },
-  // cartProducts: [mongoose.Schema.Types.ObjectId],
 });
 module.exports = mongoose.model("Cart", CartSchema);

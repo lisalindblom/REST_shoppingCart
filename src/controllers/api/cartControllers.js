@@ -1,6 +1,6 @@
 const Cart = require("../../models/Carts");
 const Product = require("../../models/Products");
-const { NotFoundError, BadRequestError } = require("../../utils/errors");
+const { NotFoundError } = require("../../utils/errors");
 
 exports.createCart = async (req, res) => {
   const totalPrice = req.body.totalPrice;
@@ -19,7 +19,6 @@ exports.createCart = async (req, res) => {
     .status(201)
     .json(newCart);
 };
-
 exports.getAllCarts = async (req, res) => {
   const carts = await Cart.find();
   return res.json({
@@ -85,7 +84,6 @@ exports.addProductToCart = async (req, res) => {
 
   return res.json(updatedCart);
 };
-
 exports.removeProductFromCart = async (req, res) => {
   const cartId = req.params.cartId;
   const productId = req.body.id;
@@ -93,7 +91,7 @@ exports.removeProductFromCart = async (req, res) => {
   const cartToUse = await Cart.findById(cartId);
   if (!cartToUse) throw new NotFoundError("This cart does not exist");
 
-  //måste kontrollera om den finns i listan...
+  //måste kontrollera om den finns i listan, inte i databasen
   const productToRemove = await Product.findById(productId);
   if (!productToRemove) throw new NotFoundError("This product does not exist");
 
@@ -104,12 +102,14 @@ exports.removeProductFromCart = async (req, res) => {
 
       if (cartToUse.cartProducts[i].numberOfProduct < 1) {
         cartToUse.cartProducts.splice([i], 1);
-        console.log("ta bort helt");
-
         await cartToUse.save();
       }
     }
   }
+
+  if (cartToUse.cartProducts.length < 1)
+    throw new NotFoundError("This cart is empty");
+
   cartToUse.totalPrice = 0;
   for (let i = 0; i < cartToUse.cartProducts.length; i++) {
     cartToUse.totalPrice +=

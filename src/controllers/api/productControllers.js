@@ -1,5 +1,4 @@
 const Products = require("../../models/Products");
-const Cart = require("../../models/Carts");
 const { NotFoundError } = require("../../utils/errors");
 
 exports.getAllProducts = async (req, res) => {
@@ -16,11 +15,11 @@ exports.getAllProducts = async (req, res) => {
     },
   });
 };
+
 exports.getProductById = async (req, res) => {
   const productId = req.params.productId;
   const product = await Products.findById(productId);
-  if (!product)
-    throw new NotFoundError("A product with this id does not exist");
+  if (!product) throw new NotFoundError("This product does not exist");
 
   return res.json(product);
 };
