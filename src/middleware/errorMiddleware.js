@@ -10,9 +10,5 @@ exports.errorMiddleware = (error, req, res, next) => {
     customErrorResponse.statusCode = 404;
     customErrorResponse.message = "A resource with that id does not exist";
   }
-
-  // prettier-ignore
-  return res
-		.status(customErrorResponse.statusCode)
-		.json(customErrorResponse)
+  return res.status(customErrorResponse.statusCode).json(customErrorResponse);
 };

@@ -36,7 +36,7 @@ exports.getCartById = async (req, res) => {
 exports.deleteCart = async (req, res) => {
   const cartId = req.params.cartId;
   const cartToDelete = await Cart.findById(cartId);
-  if (!cartToDelete) throw new NotFoundError("Cart does not exist");
+  if (!cartToDelete) throw new NotFoundError("This cart does not exist");
   await cartToDelete.delete();
   return res.sendStatus(204);
 };
@@ -91,10 +91,6 @@ exports.removeProductFromCart = async (req, res) => {
   const cartToUse = await Cart.findById(cartId);
   if (!cartToUse) throw new NotFoundError("This cart does not exist");
 
-  //måste kontrollera om den finns i listan, inte i databasen
-  const productToRemove = await Product.findById(productId);
-  if (!productToRemove) throw new NotFoundError("This product does not exist");
-
   for (let i = 0; i < cartToUse.cartProducts.length; i++) {
     if (cartToUse.cartProducts[i]._id == productId) {
       cartToUse.cartProducts[i].numberOfProduct -= 1;
@@ -107,9 +103,11 @@ exports.removeProductFromCart = async (req, res) => {
     }
   }
 
-  if (cartToUse.cartProducts.length < 1)
+  if (cartToUse.cartProducts.length < 1) {
+    cartToUse.totalPrice = 0;
+    await cartToUse.save();
     throw new NotFoundError("This cart is empty");
-
+  }
   cartToUse.totalPrice = 0;
   for (let i = 0; i < cartToUse.cartProducts.length; i++) {
     cartToUse.totalPrice +=

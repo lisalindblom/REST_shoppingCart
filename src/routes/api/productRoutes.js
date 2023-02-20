@@ -3,7 +3,6 @@ const router = express.Router();
 const {
   getAllProducts,
   getProductById,
-  addProductToCart,
 } = require("../../controllers/api/productControllers");
 
 router.get("/:productId", getProductById);
